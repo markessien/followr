@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"time"
@@ -29,13 +30,19 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func add_site(w http.ResponseWriter, r *http.Request) {
-	if name := r.FormValue("site"); name != "" {
+	if site_name := r.FormValue("site"); site_name != "" {
 
 		db.Update(func(tx *bolt.Tx) error {
-			b := tx.Bucket([]byte("MyBucket"))
-			err := b.Put([]byte("answer"), []byte("42"))
+			fmt.Println("Updating")
+			b := tx.Bucket([]byte("Websites"))
+			err := b.Put([]byte("site-name"), []byte(site_name))
 			return err
 		})
 
+	}
+
+	templates := template.Must(template.ParseFiles("templates/add.html"))
+	if err := templates.ExecuteTemplate(w, "add.html", nil); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

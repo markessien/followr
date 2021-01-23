@@ -8,16 +8,17 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-var db bolt.DB
+var db *bolt.DB
 
 func start_db() {
 	// Open the my.db data file in your current directory.
 	// It will be created if it doesn't exist.
-	db, err := bolt.Open("follows.db", 0600, &bolt.Options{Timeout: 10 * time.Second})
+	var err error
+	db, err = bolt.Open("follows.db", 0600, &bolt.Options{Timeout: 10 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
+	// defer db.Close()
 
 	db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte("Websites"))

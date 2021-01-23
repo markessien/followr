@@ -13,3 +13,8 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+.vscode
+follows.db.lock
+follows.db
+__debug_bin
