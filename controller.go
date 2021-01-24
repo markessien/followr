@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 	"time"
 
-	"github.com/boltdb/bolt"
+	"github.com/markessien/followr/services"
 )
 
 //Create a struct that holds information to be displayed in our HTML file
@@ -29,17 +28,25 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func add_site(w http.ResponseWriter, r *http.Request) {
-	if site_name := r.FormValue("site"); site_name != "" {
+func site_timeline(w http.ResponseWriter, r *http.Request) {
 
-		db.Update(func(tx *bolt.Tx) error {
-			fmt.Println("Updating")
-			b := tx.Bucket([]byte("Websites"))
-			err := b.Put([]byte("site-name"), []byte(site_name))
-			return err
-		})
+	templates := template.Must(template.ParseFiles("templates/site_timeline.html"))
+	welcome := Welcome{"Anonymous", time.Now().Format(time.Stamp)}
 
+	if name := r.FormValue("name"); name != "" {
+		welcome.Name = name
 	}
+
+	if err := templates.ExecuteTemplate(w, "site_timeline.html", welcome); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func add_site(w http.ResponseWriter, r *http.Request) {
+	site_name := r.FormValue("sitename")
+	site_password := r.FormValue("sitepassword")
+
+	services.AddNewSite(db, site_name, site_password)
 
 	templates := template.Must(template.ParseFiles("templates/add.html"))
 	if err := templates.ExecuteTemplate(w, "add.html", nil); err != nil {

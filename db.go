@@ -10,11 +10,11 @@ import (
 
 var db *bolt.DB
 
-func start_db() {
+func init_db() {
 	// Open the my.db data file in your current directory.
 	// It will be created if it doesn't exist.
 	var err error
-	db, err = bolt.Open("follows.db", 0600, &bolt.Options{Timeout: 10 * time.Second})
+	db, err = bolt.Open("db/follows.db", 0600, &bolt.Options{Timeout: 10 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}

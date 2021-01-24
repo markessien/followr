@@ -6,9 +6,18 @@
          <link rel="stylesheet" href="/static/stylesheets/welcome-template.css">
 
          <!-- The welcome struct (shown in the main.go code) is received within the HTML and we just need to use the . operator and retrieve the information we want -->
-         <title>ADDED</title>
+         <title>Add your site to Followr</title>
    </head>
    <body>
-      <div class="welcome center">ADDED</div>
+      <div class="welcome center">Add your site</div>
+
+      <form method="POST" action="/add-site">
+        <label for="sitename">Site URL:</label><br>
+        <input type="text" id="sitename" name="sitename"><br>
+        <label for="sitepassword">Password:</label><br>
+        <input type="text" id="sitepassword" name="sitepassword">
+        <input type="submit" value="Submit">
+      </form> 
+
    </body>
 </html>
