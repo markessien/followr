@@ -53,3 +53,22 @@ func add_site(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
+func login(w http.ResponseWriter, r *http.Request) {
+	templates := template.Must(template.ParseFiles("templates/login.html"))
+	if err := templates.ExecuteTemplate(w, "login.html", nil); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func add_feed(w http.ResponseWriter, r *http.Request) {
+	site_name := r.FormValue("sitename")
+	feed_url := r.FormValue("feed_url")
+
+	services.AddNewSite(db, site_name, feed_url)
+
+	templates := template.Must(template.ParseFiles("templates/add.html"))
+	if err := templates.ExecuteTemplate(w, "add.html", nil); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
