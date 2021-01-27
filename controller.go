@@ -16,14 +16,16 @@ type Welcome struct {
 
 func index(w http.ResponseWriter, r *http.Request) {
 
-	templates := template.Must(template.ParseFiles("templates/index.html"))
+	// templates := template.Must(template.ParseFiles("templates/index.html"))
+	templates, _ := template.New("").ParseFiles("templates/index.html", "templates/base.html")
+
 	welcome := Welcome{"Anonymous", time.Now().Format(time.Stamp)}
 
 	if name := r.FormValue("name"); name != "" {
 		welcome.Name = name
 	}
 
-	if err := templates.ExecuteTemplate(w, "index.html", welcome); err != nil {
+	if err := templates.ExecuteTemplate(w, "base", welcome); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -42,21 +44,22 @@ func site_timeline(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func add_site(w http.ResponseWriter, r *http.Request) {
+func signup(w http.ResponseWriter, r *http.Request) {
 	site_name := r.FormValue("sitename")
 	site_password := r.FormValue("sitepassword")
 
 	services.AddNewSite(db, site_name, site_password)
 
-	templates := template.Must(template.ParseFiles("templates/add.html"))
-	if err := templates.ExecuteTemplate(w, "add.html", nil); err != nil {
+	templates, _ := template.New("").ParseFiles("templates/signup.html", "templates/base.html")
+	if err := templates.ExecuteTemplate(w, "base", nil); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	templates := template.Must(template.ParseFiles("templates/login.html"))
-	if err := templates.ExecuteTemplate(w, "login.html", nil); err != nil {
+
+	templates, _ := template.New("").ParseFiles("templates/login.html", "templates/base.html")
+	if err := templates.ExecuteTemplate(w, "base", nil); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
