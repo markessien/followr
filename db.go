@@ -21,6 +21,18 @@ func init_db() {
 	// defer db.Close()
 
 	db.Update(func(tx *bolt.Tx) error {
+
+		// A single new item found in a feed
+		_, err = tx.CreateBucketIfNotExists([]byte("Users"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+
+		_, err = tx.CreateBucketIfNotExists([]byte("Sessions"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+
 		_, err := tx.CreateBucketIfNotExists([]byte("Websites"))
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
@@ -44,4 +56,8 @@ func init_db() {
 
 		return nil
 	})
+}
+
+func GetValueFromDB(db *bolt.DB, table string, key string) {
+
 }

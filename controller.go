@@ -45,18 +45,35 @@ func site_timeline(w http.ResponseWriter, r *http.Request) {
 }
 
 func signup(w http.ResponseWriter, r *http.Request) {
-	site_name := r.FormValue("sitename")
-	site_password := r.FormValue("sitepassword")
+	user_email := r.FormValue("email")
+	user_password := r.FormValue("password")
 
-	services.AddNewSite(db, site_name, site_password)
+	if user_email != "" && user_password != "" {
+		services.CreateUser(db, user_email, user_password)
+	}
 
-	templates, _ := template.New("").ParseFiles("templates/signup.html", "templates/base.html")
+	templates, _ := template.ParseFiles("templates/signup.html", "templates/base.html")
 	if err := templates.ExecuteTemplate(w, "base", nil); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
+
+	user_email := r.FormValue("email")
+	user_password := r.FormValue("password")
+
+	if user_email != "" && user_password != "" {
+		user, err := services.LoginUser(db, user_email, user_password)
+
+		if err == nil {
+			http.SetCookie(w, &http.Cookie{
+				Name:    "session_token",
+				Value:   user.SessionToken,
+				Expires: time.Now().Add(1200 * time.Second),
+			})
+		}
+	}
 
 	templates, _ := template.New("").ParseFiles("templates/login.html", "templates/base.html")
 	if err := templates.ExecuteTemplate(w, "base", nil); err != nil {
@@ -65,10 +82,16 @@ func login(w http.ResponseWriter, r *http.Request) {
 }
 
 func add_feed(w http.ResponseWriter, r *http.Request) {
-	site_name := r.FormValue("sitename")
+	user, err := services.ValidateLoggedIn(db, w, r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// site_name := r.FormValue("sitename")
 	feed_url := r.FormValue("feed_url")
 
-	services.AddNewSite(db, site_name, feed_url)
+	services.AddNewSite(db, user.EmailAddress, feed_url)
 
 	templates := template.Must(template.ParseFiles("templates/add.html"))
 	if err := templates.ExecuteTemplate(w, "add.html", nil); err != nil {
