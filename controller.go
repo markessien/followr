@@ -30,6 +30,21 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func dashboard(w http.ResponseWriter, r *http.Request) {
+	user, err := services.ValidateLoggedIn(db, w, r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// templates := template.Must(template.ParseFiles("templates/index.html"))
+	templates, _ := template.New("").ParseFiles("templates/dashboard.html", "templates/base.html")
+
+	if err := templates.ExecuteTemplate(w, "base", user.EmailAddress); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func site_timeline(w http.ResponseWriter, r *http.Request) {
 
 	templates := template.Must(template.ParseFiles("templates/site_timeline.html"))
