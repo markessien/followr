@@ -40,9 +40,11 @@ func dashboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	feeds := services.GetUserFeeds(db, user)
+
 	m := map[string]interface{}{
 		"User":  user,
-		"Feeds": nil,
+		"Feeds": feeds,
 	}
 
 	// templates := template.Must(template.ParseFiles("templates/index.html"))

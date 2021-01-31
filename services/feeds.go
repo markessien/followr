@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 
@@ -12,6 +13,35 @@ type Feed struct {
 	Name    string
 	Url     string
 	AddedBy string
+}
+
+// itob returns an 8-byte big endian representation of v.
+func itob(v int) []byte {
+	b := make([]byte, 8)
+	binary.BigEndian.PutUint64(b, uint64(v))
+	return b
+}
+
+func GetUserFeeds(db *bolt.DB, user User) []Feed {
+
+	feedList := make([]Feed, len(user.FeedIDs))
+
+	db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("Feeds"))
+
+		for i := 0; i < len(user.FeedIDs); i++ {
+			v := b.Get(itob(user.FeedIDs[i]))
+
+			var feed Feed
+			json.Unmarshal(v, &feed)
+
+			feedList = append(feedList, feed)
+		}
+
+		return nil
+	})
+
+	return feedList
 }
 
 func AddNewFeed(db *bolt.DB, feed_url string, user_email string) {
@@ -31,7 +61,7 @@ func AddNewFeed(db *bolt.DB, feed_url string, user_email string) {
 				feed.ID = int(id)
 
 				feed_json, _ := json.Marshal(feed)
-				b.Put([]byte(feed_url), feed_json)
+				b.Put([]byte(itob(feed.ID)), feed_json)
 			}
 
 			b = tx.Bucket([]byte("Users"))

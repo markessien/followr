@@ -35,6 +35,13 @@
                 Office closed on July 2nd
               </a>
             </h3>
+
+            {{range .Feeds}}
+              <div class="item">
+                <h3 class="name">{{.Url}}</h3>
+              </div>
+            {{end}}
+
             <p class="mt-1 text-sm text-gray-600 line-clamp-2">
                 Welcome {{.User.EmailAddress}}
               Cum qui rem deleniti. Suscipit in dolor veritatis sequi aut. Vero ut earum quis deleniti. Ut a sunt eum cum ut repudiandae possimus. Nihil ex tempora neque cum consectetur dolores.
