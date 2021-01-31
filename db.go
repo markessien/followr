@@ -33,17 +33,7 @@ func init_db() {
 			return fmt.Errorf("create bucket: %s", err)
 		}
 
-		_, err := tx.CreateBucketIfNotExists([]byte("Websites"))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
-		}
-
 		_, err = tx.CreateBucketIfNotExists([]byte("Feeds"))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
-		}
-
-		_, err = tx.CreateBucketIfNotExists([]byte("WebsiteFeed"))
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}

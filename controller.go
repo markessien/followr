@@ -16,31 +16,39 @@ type Welcome struct {
 
 func index(w http.ResponseWriter, r *http.Request) {
 
+	user, _ := services.ValidateLoggedIn(db, w, r)
+
+	m := map[string]interface{}{
+		"User":  user,
+		"Feeds": nil,
+	}
+
 	// templates := template.Must(template.ParseFiles("templates/index.html"))
 	templates, _ := template.New("").ParseFiles("templates/index.html", "templates/base.html")
 
-	welcome := Welcome{"Anonymous", time.Now().Format(time.Stamp)}
-
-	if name := r.FormValue("name"); name != "" {
-		welcome.Name = name
-	}
-
-	if err := templates.ExecuteTemplate(w, "base", welcome); err != nil {
+	if err := templates.ExecuteTemplate(w, "base", m); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func dashboard(w http.ResponseWriter, r *http.Request) {
+	// user := nil
+
 	user, err := services.ValidateLoggedIn(db, w, r)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
+	m := map[string]interface{}{
+		"User":  user,
+		"Feeds": nil,
+	}
+
 	// templates := template.Must(template.ParseFiles("templates/index.html"))
 	templates, _ := template.New("").ParseFiles("templates/dashboard.html", "templates/base.html")
 
-	if err := templates.ExecuteTemplate(w, "base", user.EmailAddress); err != nil {
+	if err := templates.ExecuteTemplate(w, "base", m); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -87,6 +95,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 				Value:   user.SessionToken,
 				Expires: time.Now().Add(1200 * time.Second),
 			})
+
+			http.Redirect(w, r, "/dashboard", 301)
 		}
 	}
 
@@ -106,10 +116,7 @@ func add_feed(w http.ResponseWriter, r *http.Request) {
 	// site_name := r.FormValue("sitename")
 	feed_url := r.FormValue("feed_url")
 
-	services.AddNewSite(db, user.EmailAddress, feed_url)
+	services.AddNewFeed(db, feed_url, user.EmailAddress)
 
-	templates := template.Must(template.ParseFiles("templates/add.html"))
-	if err := templates.ExecuteTemplate(w, "add.html", nil); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	http.Redirect(w, r, "/dashboard", 301)
 }

@@ -16,8 +16,12 @@
   }
   ```
 -->
-{{$email := .}}
 
+<form action="/add-feed">
+    <label for="fname">Website to add:</label><br>
+    <input type="text" id="feed_url" name="feed_url" value=""><br>
+    <input type="submit" value="Submit">
+  </form>
 
 <div>
     <div class="flow-root mt-6">
@@ -32,7 +36,7 @@
               </a>
             </h3>
             <p class="mt-1 text-sm text-gray-600 line-clamp-2">
-                Welcome {{$email}}
+                Welcome {{.User.EmailAddress}}
               Cum qui rem deleniti. Suscipit in dolor veritatis sequi aut. Vero ut earum quis deleniti. Ut a sunt eum cum ut repudiandae possimus. Nihil ex tempora neque cum consectetur dolores.
             </p>
           </div>

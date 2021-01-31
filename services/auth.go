@@ -15,6 +15,8 @@ type User struct {
 	EmailAddress string
 	SessionToken string
 	SessionTime  int
+	LoggedIn     bool
+	FeedIDs      []int
 }
 
 func CreateUser(db *bolt.DB, emailAddress string, password string) {
@@ -73,6 +75,7 @@ func LoginUser(db *bolt.DB, emailAddress string, password string) (User, error) 
 func ValidateLoggedIn(db *bolt.DB, w http.ResponseWriter, r *http.Request) (User, error) {
 
 	var user User
+	user.LoggedIn = false
 
 	// We can obtain the session token from the requests cookies, which come with every request
 	c, err := r.Cookie("session_token")
@@ -98,7 +101,7 @@ func ValidateLoggedIn(db *bolt.DB, w http.ResponseWriter, r *http.Request) (User
 		v = b.Get([]byte(email_address))
 
 		err = json.Unmarshal(v, &user)
-
+		user.LoggedIn = true
 		return nil
 	})
 
