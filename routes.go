@@ -9,4 +9,5 @@ func handle_routes() {
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/add-feed", add_feed)
 	http.HandleFunc("/dashboard", dashboard)
+	http.HandleFunc("/update", updateFeeds)
 }

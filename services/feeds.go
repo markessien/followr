@@ -55,6 +55,8 @@ func AddNewFeed(db *bolt.DB, feed_url string, user_email string) {
 
 			b := tx.Bucket([]byte("Feeds"))
 
+			// Check if feed is in our main feed table, if not
+			// add it
 			v := b.Get([]byte(feed_url))
 			if v == nil {
 				id, _ := b.NextSequence()
@@ -64,12 +66,14 @@ func AddNewFeed(db *bolt.DB, feed_url string, user_email string) {
 				b.Put([]byte(itob(feed.ID)), feed_json)
 			}
 
+			// find the user
 			b = tx.Bucket([]byte("Users"))
 			v = b.Get([]byte(user_email))
 
 			var user User
 			json.Unmarshal(v, &user)
 
+			// Check if this user has this feed id
 			found := false
 			for i := 0; i < len(user.FeedIDs); i++ {
 				fmt.Printf("%s\n", user.FeedIDs[i])
@@ -80,6 +84,7 @@ func AddNewFeed(db *bolt.DB, feed_url string, user_email string) {
 				}
 			}
 
+			// if not, add the feed id to the user structure
 			if found == false {
 				user.FeedIDs = append(user.FeedIDs, feed.ID)
 				user_json, _ := json.Marshal(user)

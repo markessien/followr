@@ -14,6 +14,10 @@ type Welcome struct {
 	Time string
 }
 
+func updateFeeds(w http.ResponseWriter, r *http.Request) {
+	services.UpdateFeeds(db)
+}
+
 func index(w http.ResponseWriter, r *http.Request) {
 
 	user, _ := services.ValidateLoggedIn(db, w, r)
